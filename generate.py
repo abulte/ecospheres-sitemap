@@ -65,6 +65,7 @@ def create_sitemap(urls):
         lastmod.text = url_data["last_modified"].isoformat()
 
     tree = ElementTree.ElementTree(sitemap)
+    ElementTree.indent(tree)
     tree.write("sitemap.xml")
 
 
