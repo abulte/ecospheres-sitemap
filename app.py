@@ -12,7 +12,7 @@ app.config["CACHE_DIR"] = "/tmp"
 cache = Cache(app)
 
 
-@app.route("/")
+@app.route("/sitemap.xml")
 @cache.cached(timeout=3600 * 3)
 def sitemap():
     response = make_response(generate(write=False))
