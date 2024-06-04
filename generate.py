@@ -51,7 +51,7 @@ def fetch_urls():
     return results
 
 
-def create_sitemap(urls):
+def create_sitemap(urls, write=True) -> str:
     """Creates a sitemap XML from a list of URLs."""
     sitemap = ElementTree.Element("urlset", {
         "xmlns": "http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -66,9 +66,17 @@ def create_sitemap(urls):
 
     tree = ElementTree.ElementTree(sitemap)
     ElementTree.indent(tree)
-    tree.write("sitemap.xml")
+    if write:
+        tree.write("dist/sitemap.xml")
+        return ""
+    else:
+        return ElementTree.tostring(tree.getroot(), encoding="unicode")
+
+
+def generate(write=True) -> str:
+    urls = fetch_urls()
+    return create_sitemap(urls, write=write)
 
 
 if __name__ == "__main__":
-    urls = fetch_urls()
-    create_sitemap(urls)
+    generate()
