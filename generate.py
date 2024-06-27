@@ -84,14 +84,15 @@ def generate(write=True) -> str:
     urls = fetch_urls()
     res = create_sitemap(urls, write=write)
     if (s3_endpoint := os.getenv("AWS_ENDPOINT_URL")):
+        bucket = os.getenv("AWS_ACCESS_KEY_ID")
         minio_client = boto3.client(
             "s3",
             endpoint_url=s3_endpoint,
-            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+            aws_access_key_id=bucket,
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
         )
         minio_client.upload_file(
-            "dist/sitemap.xml", "demo-ecologie", "sitemap.xml"
+            "dist/sitemap.xml", bucket, "sitemap.xml"
         )
     return res
 
