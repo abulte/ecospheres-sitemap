@@ -1,13 +1,20 @@
+import os
 import email.utils
 
 from datetime import datetime, UTC
 from xml.etree import ElementTree
 
+import boto3
 import requests
 
-ECOSPHERES_URL = "https://ecologie.data.gouv.fr"
-DATAGOUVFR_URL = "https://www.data.gouv.fr/api"
-UNIVERSE_NAME = "univers-ecospheres"
+ENV = os.getenv("ENV", "www")
+ECOSPHERES_URL = (
+    "https://demo.ecologie.data.gouv.fr"
+    if ENV == "demo"
+    else "https://ecologie.data.gouv.fr"
+)
+DATAGOUVFR_URL = f"https://{ENV}.data.gouv.fr/api"
+UNIVERSE_NAME = "ecospheres" if ENV == "demo" else "univers-ecospheres"
 
 STATIC_URLS = [
     "/",
@@ -75,7 +82,18 @@ def create_sitemap(urls, write=True) -> str:
 
 def generate(write=True) -> str:
     urls = fetch_urls()
-    return create_sitemap(urls, write=write)
+    res = create_sitemap(urls, write=write)
+    if (s3_endpoint := os.getenv("AWS_ENDPOINT_URL")):
+        minio_client = boto3.client(
+            "s3",
+            endpoint_url=s3_endpoint,
+            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        )
+        minio_client.upload_file(
+            "dist/sitemap.xml", "demo-ecologie", "sitemap.xml"
+        )
+    return res
 
 
 if __name__ == "__main__":
