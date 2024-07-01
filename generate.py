@@ -92,7 +92,10 @@ def generate(write=True) -> str:
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
         )
         minio_client.upload_file(
-            "dist/sitemap.xml", bucket, "sitemap.xml"
+            Filename="dist/sitemap.xml",
+            Bucket=bucket,
+            Key="sitemap.xml",
+            ExtraArgs={'ContentType': 'application/xml; charset=utf-8'}
         )
     return res
 
